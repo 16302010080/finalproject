@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+		PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+		"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+	<mapper namespace="resources.mapper.StudentMapper">
+	<!--mapper namespace="springboot.dao.StudentDao"-->
+
+	<!--首页课程-->
+	<select id="listAllCourse" parameterType="java.lang.String" resultType="springboot.response.CourseResponse">
+		SELECT * FROM course JOIN teacher;
+	</select>
+
+	<!--参与课程列表-->
+	<select id="listMyCourse" parameterType="java.lang.String" resultType="springboot.response.CourseResponse">
+		SELECT * FROM course,teacher, student, coursetoken WHERE course.courseID=coursetoken.courseID AND
+		 teacher.teacherID=coursetoken.teacherID AND student.studentID=coursetoken.studentID;
+	</select>
+
+	<!--收藏课程信息-->
+	<select id="listCollectCourse" parameterType="java.lang.String" resultType="springboot.response.CourseResponse">
+		SELECT * FROM collectcourse,student,course WHERE course.courseID=collectcourse.courseID AND
+		collectcourse.studentID AND studentNickName=#{studentNickName} GROUP BY course.courseID;
+	</select>
+
+	<!--学生修改个人信息-->
+	<select id="findStuByID" resultType="springboot.domain.Student">
+		 select * from student where studentID = #{studentID}
+	</select>
+	<select id="findStuByNickName" resultType="springboot.domain.Student">
+		select * from student where studentNickName = #{studentNickName}
+	</select>
+
+	<!--更新个人信息-->
+	<update id="modifyStuMsg" parameterType="springboot.domain.Student"  useGeneratedKeys="true">
+		update student set studentName=#{studentName},studentNickName=#{studentNickName},gender=#{gender},email=#{email},avatarURL=#{avatarURL}
+		where studentID=#{studentID}
+	</update>
+
+	<!--添加课程-->
+	<select id="findCourseTecher">
+		select * from course JOIN teacher
+	</select>
+	<!--添加课程-->
+	<select id="findCourseByName" parameterType="java.lang.String" resultType="springboot.domain.Course">
+		select * from course where courseName = #{courseName}
+	</select>
+
+	<!--添加课程-->
+	<select id="findCourseByID" parameterType="java.lang.Integer" resultType="springboot.domain.Course">
+		select * from course where courseID = #{courseID}
+	</select>
+
+	<!--添加学生-->
+	<insert id="addStudent" parameterType="springboot.domain.Student" keyProperty="studentID">
+		insert into
+		student(studentID,studentName,studentNickName,gender,email,avatarURL)
+		values
+		(#{studentID},#{studentName},#{studentNickName},#{gender},#{email},#{avatarURL})
+	</insert>
+
+	<!--添加课程-->
+	<insert id="addCourse" parameterType="springboot.domain.Course" useGeneratedKeys="true" >
+		insert into course (courseName, instruction, courseImageURL, introduction, price, startTime)
+		values (#{courseName},#{instruction},#{courseImageURL},#{introduction},#{price},#{startTime})
+	</insert>
+
+	<!--添加收藏课程-->
+	<insert id="addCollectCourse" parameterType="springboot.domain.Course" useGeneratedKeys="true" >
+		insert into collectcourse (courseID, studentID)
+		values (#{courseID},#{studentID})
+	</insert>
+
+	<!--添加参与课程-->
+	<insert id="addTokenCourse" parameterType="springboot.domain.Course" useGeneratedKeys="true" >
+		insert into coursetoken (courseID,studentID,teacherID)
+		values (#{courseID},#{studentID},#{teachID})
+	</insert>
+
+	<!--已参与课程-->
+	<select id="findCourseByStuID" parameterType="java.lang.String" resultType="springboot.domain.Course">
+		select * from coursetoken,course where coursetoken.studentID='1'and course.courseID = coursetoken.courseID
+	</select>
+
+	<!-- 聊天消息-->
+	<select id="recvMsg" resultType="springboot.domain.Message">
+		select * from message
+	</select>
+
+	<select id="check"  parameterType="springboot.domain.Message" resultType="springboot.domain.Message">
+		select * from message where studentID = #{studentID} and teacherID =#{teacherID}
+	</select>
+
+	<insert id="sendMsg" parameterType="springboot.domain.Message" useGeneratedKeys="true" >
+		insert into message (messageID, sender, teacherID,studentID,content,sendTime)
+		values (#{messageID},#{sender},#{teacherID},#{studentID},#{content},#{sendTime})
+	</insert>
+
+	<select id="findAllStudent" resultType="springboot.domain.Student">
+    select * from Student
+  </select>
+
+</mapper>
